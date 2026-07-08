@@ -49,13 +49,13 @@ void addStudent() {
     }
     
     printf("Enter Student Name: ");
-    scanf(" %[^\n]", newStudent.name);
+    scanf(" %s", newStudent.name);
     
     printf("Enter Student GPA: ");
     scanf("%f", &newStudent.gpa);
     
     printf("Enter Student Major: ");
-    scanf(" %[^\n]", newStudent.major);
+    scanf(" %s", newStudent.major);
     
     studentDB[studentCount] = newStudent;
     studentCount++;
@@ -157,7 +157,7 @@ void searchByMajor() {
     }
     
     printf("Enter Major to search: ");
-    scanf(" %[^\n]", major);
+    scanf(" %s", major);
     
     printf("\n========== Students in %s ==========\n", major);
     printf("%-10s %-20s %-10s\n", "ID", "Name", "GPA");
