@@ -4,13 +4,13 @@
 #define MAX_STUDENTS 100
 
 typedef struct {
-    int studentIDs[MAX_STUDENTS];
-    char studentNames[MAX_STUDENTS][50];
-    float studentGPAs[MAX_STUDENTS];
-    char studentMajors[MAX_STUDENTS][50];
-} STUDENT;
+    int id;
+    char name[50];
+    float gpa;
+    char major[50];
+} Student;
 
-STUDENT studentDB;
+Student studentDB[MAX_STUDENTS];
 int studentCount = 0;
 
 void displayMenu() {
@@ -25,45 +25,39 @@ void displayMenu() {
 }
 
 void addStudent() {
-    int id;
-    char name[50];
-    float gpa;
-    char major[50];
+    Student newStudent;
     int duplicate = 0;
     
     if (studentCount >= MAX_STUDENTS) {
-        printf("Error: Student database is full!\n");
+        printf("ERROR: Student database is full!\n");
         return;
     }
     
     printf("Enter Student ID: ");
-    scanf("%d", &id);
+    scanf("%d", &newStudent.id);
     
     for (int i = 0; i < studentCount; i++) {
-        if (studentDB.studentIDs[i] == id) {
+        if (studentDB[i].id == newStudent.id) {
             duplicate = 1;
             break;
         }
     }
     
     if (duplicate == 1) {
-        printf("Error: Student with ID %d already exists!\n", id);
+        printf("ERROR: Student with ID %d already exists!\n", newStudent.id);
         return;
     }
     
     printf("Enter Student Name: ");
-    scanf(" %s", name);
+    scanf(" %[^\n]", newStudent.name);
     
     printf("Enter Student GPA: ");
-    scanf("%f", &gpa);
+    scanf("%f", &newStudent.gpa);
     
     printf("Enter Student Major: ");
-    scanf(" %s", major);
+    scanf(" %[^\n]", newStudent.major);
     
-    studentDB.studentIDs[studentCount] = id;
-    strcpy(studentDB.studentNames[studentCount], name);
-    studentDB.studentGPAs[studentCount] = gpa;
-    strcpy(studentDB.studentMajors[studentCount], major);
+    studentDB[studentCount] = newStudent;
     studentCount++;
     
     printf("\nStudent added successfully!\n");
@@ -81,10 +75,10 @@ void displayAllStudents() {
     
     for (int i = 0; i < studentCount; i++) {
         printf("%-10d %-20s %-10.2f %-15s\n", 
-               studentDB.studentIDs[i], 
-               studentDB.studentNames[i], 
-               studentDB.studentGPAs[i], 
-               studentDB.studentMajors[i]);
+               studentDB[i].id, 
+               studentDB[i].name, 
+               studentDB[i].gpa, 
+               studentDB[i].major);
     }
     printf("===================================\n");
     printf("Total Students: %d\n", studentCount);
@@ -102,12 +96,12 @@ void searchByID() {
     scanf("%d", &id);
     
     for (int i = 0; i < studentCount; i++) {
-        if (studentDB.studentIDs[i] == id) {
+        if (studentDB[i].id == id) {
             printf("\nStudent Found:\n");
-            printf("ID: %d\n", studentDB.studentIDs[i]);
-            printf("Name: %s\n", studentDB.studentNames[i]);
-            printf("GPA: %.2f\n", studentDB.studentGPAs[i]);
-            printf("Major: %s\n", studentDB.studentMajors[i]);
+            printf("ID: %d\n", studentDB[i].id);
+            printf("Name: %s\n", studentDB[i].name);
+            printf("GPA: %.2f\n", studentDB[i].gpa);
+            printf("Major: %s\n", studentDB[i].major);
             found = 1;
             break;
         }
@@ -137,12 +131,12 @@ void searchByGPA() {
     printf("------------------------------------------------\n");
     
     for (int i = 0; i < studentCount; i++) {
-        if (studentDB.studentGPAs[i] >= minGPA && studentDB.studentGPAs[i] <= maxGPA) {
+        if (studentDB[i].gpa >= minGPA && studentDB[i].gpa <= maxGPA) {
             printf("%-10d %-20s %-10.2f %-15s\n", 
-                   studentDB.studentIDs[i], 
-                   studentDB.studentNames[i], 
-                   studentDB.studentGPAs[i], 
-                   studentDB.studentMajors[i]);
+                   studentDB[i].id, 
+                   studentDB[i].name, 
+                   studentDB[i].gpa, 
+                   studentDB[i].major);
             found = 1;
         }
     }
@@ -163,18 +157,18 @@ void searchByMajor() {
     }
     
     printf("Enter Major to search: ");
-    scanf(" %s", major);
+    scanf(" %[^\n]", major);
     
     printf("\n========== Students in %s ==========\n", major);
     printf("%-10s %-20s %-10s\n", "ID", "Name", "GPA");
     printf("------------------------------------\n");
     
     for (int i = 0; i < studentCount; i++) {
-        if (strcmp(studentDB.studentMajors[i], major) == 0) {
+        if (strcmp(studentDB[i].major, major) == 0) {
             printf("%-10d %-20s %-10.2f\n", 
-                   studentDB.studentIDs[i], 
-                   studentDB.studentNames[i], 
-                   studentDB.studentGPAs[i]);
+                   studentDB[i].id, 
+                   studentDB[i].name, 
+                   studentDB[i].gpa);
             found = 1;
         }
     }
