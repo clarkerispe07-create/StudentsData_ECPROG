@@ -52,13 +52,13 @@ void addStudent() {
     }
     
     printf("Enter Student Name: ");
-    scanf(" %[^\n]", name);
+    scanf(" %s", name);
     
     printf("Enter Student GPA: ");
     scanf("%f", &gpa);
     
     printf("Enter Student Major: ");
-    scanf(" %[^\n]", major);
+    scanf(" %s", major);
     
     studentDB.studentIDs[studentCount] = id;
     strcpy(studentDB.studentNames[studentCount], name);
@@ -163,7 +163,7 @@ void searchByMajor() {
     }
     
     printf("Enter Major to search: ");
-    scanf(" %[^\n]", major);
+    scanf(" %s", major);
     
     printf("\n========== Students in %s ==========\n", major);
     printf("%-10s %-20s %-10s\n", "ID", "Name", "GPA");
