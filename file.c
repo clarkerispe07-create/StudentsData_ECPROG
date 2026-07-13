@@ -2,8 +2,10 @@
 #include <string.h>
 
 #define MAX_STUDENTS 100
+#define DATA_FILE "students.data"
 
-typedef struct {
+typedef struct
+{
     int id;
     char name[50];
     float gpa;
@@ -13,7 +15,8 @@ typedef struct {
 Student studentDB[MAX_STUDENTS];
 int studentCount = 0;
 
-void displayMenu() {
+void displayMenu()
+{
     printf("\n==========Menu==========\n");
     printf("1. Add New Student\n");
     printf("2. Display All Students\n");
@@ -24,79 +27,149 @@ void displayMenu() {
     printf("=======================\n");
 }
 
-void addStudent() {
+void saveToFile()
+{
+    FILE *fp = fopen(DATA_FILE, "wb");
+    if (fp == NULL)
+    {
+        printf("ERROR: Cannot open file for saving !\n");
+        return;
+    }
+
+    fwrite(&studentCount, sizeof(int), 1, fp);
+
+    int written = fwrite(studentDB, sizeof(Student), studentCount, fp);
+    if (written == studentCount)
+    {
+        printf("\nData saved successful to %s!\n", DATA_FILE);
+    }
+    else
+    {
+        printf("\nERROR: Only %d out of %d students were saved!\n", written, studentCount);
+    }
+
+    fclose(fp);
+}
+
+void loadFromFile()
+{
+    FILE *fp = fopen(DATA_FILE, "rb");
+    if (fp == NULL)
+    {
+        printf("no existing data file found. Starting with empty database.\n");
+        return;
+    }
+
+    int loadedCount = 0;
+    fread(&loadedCount, sizeof(int), 1, fp);
+
+    if (loadedCount > MAX_STUDENTS)
+    {
+        printf("Warning: File contains %d students but maximum is %d.\n", loadedCount, MAX_STUDENTS);
+
+        loadedCount = MAX_STUDENTS;
+    }
+
+    int read = fread(studentDB, sizeof(Student), loadedCount, fp);
+    studentCount = read;
+
+    fclose(fp);
+
+    if (read > 0)
+    {
+        printf("Loaded %d students from %s\n", studentCount, DATA_FILE);
+    }
+    else
+    {
+        printf("NO students data found in file.\n");
+    }
+}
+
+void addStudent()
+{
     Student newStudent;
     int duplicate = 0;
-    
-    if (studentCount >= MAX_STUDENTS) {
+
+    if (studentCount >= MAX_STUDENTS)
+    {
         printf("ERROR: Student database is full!\n");
         return;
     }
-    
+
     printf("Enter Student ID: ");
     scanf("%d", &newStudent.id);
-    
-    for (int i = 0; i < studentCount; i++) {
-        if (studentDB[i].id == newStudent.id) {
+
+    for (int i = 0; i < studentCount; i++)
+    {
+        if (studentDB[i].id == newStudent.id)
+        {
             duplicate = 1;
             break;
         }
     }
-    
-    if (duplicate == 1) {
+
+    if (duplicate == 1)
+    {
         printf("ERROR: Student with ID %d already exists!\n", newStudent.id);
         return;
     }
-    
+
     printf("Enter Student Name: ");
     scanf(" %s", newStudent.name);
-    
+
     printf("Enter Student GPA: ");
     scanf("%f", &newStudent.gpa);
-    
+
     printf("Enter Student Major: ");
     scanf(" %s", newStudent.major);
-    
+
     studentDB[studentCount] = newStudent;
     studentCount++;
-    
+
     printf("\nStudent added successfully!\n");
 }
 
-void displayAllStudents() {
-    if (studentCount == 0) {
+void displayAllStudents()
+{
+    if (studentCount == 0)
+    {
         printf("No students in the database!\n");
         return;
     }
-    
+
     printf("\n========== All Students ==========\n");
     printf("%-10s %-20s %-10s %-15s\n", "ID", "Name", "GPA", "Major");
     printf("----------------------------------------\n");
-    
-    for (int i = 0; i < studentCount; i++) {
-        printf("%-10d %-20s %-10.2f %-15s\n", 
-               studentDB[i].id, 
-               studentDB[i].name, 
-               studentDB[i].gpa, 
+
+    for (int i = 0; i < studentCount; i++)
+    {
+        printf("%-10d %-20s %-10.2f %-15s\n",
+               studentDB[i].id,
+               studentDB[i].name,
+               studentDB[i].gpa,
                studentDB[i].major);
     }
     printf("===================================\n");
     printf("Total Students: %d\n", studentCount);
 }
 
-void searchByID() {
+void searchByID()
+{
     int id, found = 0;
-    
-    if (studentCount == 0) {
+
+    if (studentCount == 0)
+    {
         printf("No students in the database!\n");
         return;
     }
-    
+
     printf("Enter Student ID to search: ");
     scanf("%d", &id);
-    
-    for (int i = 0; i < studentCount; i++) {
-        if (studentDB[i].id == id) {
+
+    for (int i = 0; i < studentCount; i++)
+    {
+        if (studentDB[i].id == id)
+        {
             printf("\nStudent Found:\n");
             printf("ID: %d\n", studentDB[i].id);
             printf("Name: %s\n", studentDB[i].name);
@@ -106,97 +179,128 @@ void searchByID() {
             break;
         }
     }
-    
-    if (found == 0) {
+
+    if (found == 0)
+    {
         printf("Student with ID %d not found!\n", id);
     }
 }
 
-void searchByGPA() {
+void searchByGPA()
+{
     float minGPA, maxGPA;
     int found = 0;
-    
-    if (studentCount == 0) {
+
+    if (studentCount == 0)
+    {
         printf("No students in the database!\n");
         return;
     }
-    
+
     printf("Enter minimum GPA: ");
     scanf("%f", &minGPA);
     printf("Enter maximum GPA: ");
     scanf("%f", &maxGPA);
-    
+
     printf("\n========== Students with GPA %.2f - %.2f ==========\n", minGPA, maxGPA);
     printf("%-10s %-20s %-10s %-15s\n", "ID", "Name", "GPA", "Major");
     printf("------------------------------------------------\n");
-    
-    for (int i = 0; i < studentCount; i++) {
-        if (studentDB[i].gpa >= minGPA && studentDB[i].gpa <= maxGPA) {
-            printf("%-10d %-20s %-10.2f %-15s\n", 
-                   studentDB[i].id, 
-                   studentDB[i].name, 
-                   studentDB[i].gpa, 
+
+    for (int i = 0; i < studentCount; i++)
+    {
+        if (studentDB[i].gpa >= minGPA && studentDB[i].gpa <= maxGPA)
+        {
+            printf("%-10d %-20s %-10.2f %-15s\n",
+                   studentDB[i].id,
+                   studentDB[i].name,
+                   studentDB[i].gpa,
                    studentDB[i].major);
             found = 1;
         }
     }
-    
-    if (found == 0) {
+
+    if (found == 0)
+    {
         printf("No students found with GPA in that range!\n");
     }
     printf("==================================================\n");
 }
 
-void searchByMajor() {
+void searchByMajor()
+{
     char major[50];
     int found = 0;
-    
-    if (studentCount == 0) {
+
+    if (studentCount == 0)
+    {
         printf("No students in the database!\n");
         return;
     }
-    
+
     printf("Enter Major to search: ");
     scanf(" %s", major);
-    
+
     printf("\n========== Students in %s ==========\n", major);
     printf("%-10s %-20s %-10s\n", "ID", "Name", "GPA");
     printf("------------------------------------\n");
-    
-    for (int i = 0; i < studentCount; i++) {
-        if (strcmp(studentDB[i].major, major) == 0) {
-            printf("%-10d %-20s %-10.2f\n", 
-                   studentDB[i].id, 
-                   studentDB[i].name, 
+
+    for (int i = 0; i < studentCount; i++)
+    {
+        if (strcmp(studentDB[i].major, major) == 0)
+        {
+            printf("%-10d %-20s %-10.2f\n",
+                   studentDB[i].id,
+                   studentDB[i].name,
                    studentDB[i].gpa);
             found = 1;
         }
     }
-    
-    if (found == 0) {
+
+    if (found == 0)
+    {
         printf("No students found with major: %s\n", major);
     }
     printf("==========================================\n");
 }
 
-int main() {
+int main()
+{
     int choice;
-    
-    do {
+
+    loadFromFile();
+
+    do
+    {
         displayMenu();
         printf("Enter your choice: ");
         scanf("%d", &choice);
-        
-        switch(choice) {
-            case 1: addStudent(); break;
-            case 2: displayAllStudents(); break;
-            case 3: searchByID(); break;
-            case 4: searchByGPA(); break;
-            case 5: searchByMajor(); break;
-            case 6: printf("Exiting program...\n"); break;
-            default: printf("Invalid choice! Please select 1-6.\n");
+
+        switch (choice)
+        {
+        case 1:
+            addStudent();
+            break;
+        case 2:
+            displayAllStudents();
+            break;
+        case 3:
+            searchByID();
+            break;
+        case 4:
+            searchByGPA();
+            break;
+        case 5:
+            searchByMajor();
+            break;
+        case 6:
+            printf("Saving data before exiting...\n");
+            saveToFile();
+            printf("Exiting program...\n");
+            break;
+        default:
+            printf("Invalid choice! Please select 1-6.\n");
         }
     } while (choice != 6);
-    
+
     return 0;
 }
